@@ -50,3 +50,13 @@ app.*.map.json
 .codex/
 graphify-out/
 AGENTS.md
+
+# Công cụ cục bộ và thông tin xác thực riêng
+.claude/
+.firebase/
+*-service-account.json
+service-account*.json
+.env
+.env.*
+db/co_so_du_lieu_thuc_te.json
+docs/

@@ -1,0 +1,22 @@
+{
+  "users": {
+    "mau_quan_tri": {
+      "email": "quantri@example.com",
+      "matkhau": "Được quản lý bởi Firebase Authentication",
+      "hoten": "Quản trị viên mẫu",
+      "hinhanh": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAfklEQVR4nNXOQREAIADDsFK3828AETy4RkHONsokTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuL8HXh1AaCzAbsgOB4EAAAAAElFTkSuQmCC"
+    },
+    "mau_nguyen_van_an": {
+      "email": "an@example.com",
+      "matkhau": "Được quản lý bởi Firebase Authentication",
+      "hoten": "Nguyễn Văn An",
+      "hinhanh": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAfklEQVR4nNXOQREAIADDsFK3828AETy4RkHONsokTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuL8HXh1AaCzAbsgOB4EAAAAAElFTkSuQmCC"
+    },
+    "mau_tran_thi_binh": {
+      "email": "binh@example.com",
+      "matkhau": "Được quản lý bởi Firebase Authentication",
+      "hoten": "Trần Thị Bình",
+      "hinhanh": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAfklEQVR4nNXOQREAIADDsFK3828AETy4RkHONsokTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuL8HXh1AaCzAbsgOB4EAAAAAElFTkSuQmCC"
+    }
+  }
+}

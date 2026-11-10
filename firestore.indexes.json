@@ -1,0 +1,4 @@
+{
+  "indexes": [],
+  "fieldOverrides": [{"collectionGroup": "users", "fieldPath": "hinhanh", "indexes": []}]
+}
