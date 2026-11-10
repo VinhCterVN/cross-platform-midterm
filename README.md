@@ -12,8 +12,22 @@
 flutter pub get
 firebase login
 firebase deploy --only firestore --project=profile-management-3a2f7
-flutter run -d chrome
+flutter run -d chrome --dart-define-from-file=.env
 ```
+
+### Cấu hình API key cục bộ
+
+Sao chép `.env.example` thành `.env`, điền `FIREBASE_WEB_API_KEY` và `FIREBASE_ANDROID_API_KEY` từ Firebase Console → Project settings. `.env` không được Git theo dõi. File `android/app/google-services.json` cũng chỉ giữ cục bộ; tải file đúng Android app `com.vincent.midterm` từ Firebase Console khi clone mới. Không commit file này trở lại.
+
+VS Code đã có cấu hình chạy tự truyền `.env`. Khi dùng terminal, thêm cờ cho mọi lệnh run/build:
+
+```bash
+flutter run --dart-define-from-file=.env
+flutter build apk --release --dart-define-from-file=.env
+flutter build web --dart-define-from-file=.env
+```
+
+Firebase client API key là mã định danh công khai, không phải khóa service account; chuyển sang `.env` chỉ bỏ giá trị khỏi source, không giấu được key trong APK/Web đã build. Phân quyền vẫn do Authentication và Security Rules. Giới hạn API/application phù hợp trong Google Cloud Console; không đặt service-account key vào `.env` của app. Key đã nằm trong lịch sử Git trước đây không bị xóa bằng amend commit mới nhất; nếu cần vô hiệu hóa key cũ, phải thay key trên Console và cập nhật `.env`/cấu hình Android cục bộ. Chạy lại FlutterFire có thể sinh key literal trở lại, cần kiểm tra diff trước khi commit.
 
 Không thay các SDK Android đã cấu hình. Spark có hạn mức miễn phí: hết hạn mức thì thao tác có thể bị từ chối; không tự nâng gói hay liên kết thanh toán.
 
@@ -27,7 +41,7 @@ Web tạo người dùng bằng Auth của Firebase App phụ để **không m�
 
 | File | Nội dung |
 |---|---|
-| [Báo cáo Word](docs/bao_cao_giua_ky.docx) | Tiếng Việt, Cambria, đen/trắng, có chỗ chèn ảnh |
+| [Báo cáo Word cập nhật](docs/bao_cao_giua_ky_hoc_vu.docx) | Tiếng Việt, Cambria, đen/trắng, có chỗ chèn ảnh |
 | [Báo cáo Markdown](docs/bao_cao_giua_ky.md) | Nội dung báo cáo có thể tìm kiếm |
 | [Hướng dẫn Firebase](docs/huong_dan_firebase.md) | Thiết lập Spark và vận hành trực tiếp |
 | [CSDL JSON mẫu](db/co_so_du_lieu.json) | Ba hồ sơ giả, UID minh họa; không phải bản xuất cloud |
@@ -38,7 +52,7 @@ Web tạo người dùng bằng Auth của Firebase App phụ để **không m�
 
 ## CSDL
 
-`users/{Firebase Auth UID}` có **đúng bốn trường** `email`, `matkhau`, `hoten`, `hinhanh`. UID là khóa tài liệu, không phải trường thứ năm. `matkhau` chứa `Được quản lý bởi Firebase Authentication`, không chứa mật khẩu thật hoặc hash tự chế. `hinhanh` là base64 PNG/JPEG, tối đa 200 KiB trước mã hóa; không dùng Cloud Storage.
+`users/{Firebase Auth UID}` có **đúng bốn trường** `email`, `matkhau`, `hoten`, `hinhanh`. UID là khóa tài liệu, không phải trường thứ năm. `matkhau` lưu và hiển thị đầy đủ `pbkdf2-sha256$600000$SALT_BASE64$HASH_BASE64`, dùng thư viện cryptography, salt ngẫu nhiên 16 byte và kết quả 32 byte. Không lưu mật khẩu gốc. `hinhanh` là base64 PNG/JPEG, tối đa 200 KiB trước mã hóa; không dùng Cloud Storage.
 
 Quyền admin nằm trong danh sách UID tại Security Rules, không nằm trong document hồ sơ. Client không thể tự cấp quyền bằng cách sửa mã giao diện.
 
@@ -54,3 +68,12 @@ flutter build apk --debug
 ```
 
 Xem hướng dẫn nếu Windows gặp lỗi cache Kotlin khác ổ đĩa. Kiểm thử cục bộ không xác nhận Firebase thật hoặc camera điện thoại. Bản học phần chưa có phân trang, App Check/chống lạm dụng hay đối soát tự động Auth–Firestore; không dùng dữ liệu thật để demo và không commit bí mật.
+
+
+## Cập nhật giao diện học vụ và mật khẩu băm
+
+Giao diện Web/Android dùng tông navy, nền ngà, điểm nhấn đồng và tiêu đề serif. Hash được hiển thị đầy đủ, có thể chọn/sao chép. Firebase Auth vẫn là nguồn xác thực; hash Firestore không dùng để đăng nhập. Mỗi lần đăng nhập thành công, app ghi lại hash mới với salt riêng, nên mật khẩu đã reset sẽ được cập nhật khi đăng nhập tiếp theo. Hồ sơ thiếu yêu cầu nhập lại mật khẩu để xác thực trước khi tạo hash. Tài khoản cũ chưa đăng nhập vẫn giữ marker, giao diện ghi rõ chưa có hash; không thể trích mật khẩu từ Auth.
+
+Cần triển khai Rules mới trước khi dùng bản này: `firebase deploy --only firestore --project=profile-management-3a2f7`. UID admin hiện có được giữ nguyên. Rules chỉ kiểm tra định dạng hash, không chứng minh nó khớp mật khẩu Auth. Người có quyền đọc hash có thể thử đoán mật khẩu ngoại tuyến; chỉ dùng dữ liệu giả cho demo và không công khai JSON tài khoản thật. JSON mẫu chứa hash minh họa, không phải tài khoản đăng nhập.
+
+Theo yêu cầu, không chạy kiểm thử, analyzer, build hoặc kiểm tra thiết bị cho lần sửa giao diện/hash này. Các kết quả kiểm thử cũ trong tài liệu không xác nhận phiên bản mới.

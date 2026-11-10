@@ -21,11 +21,12 @@ void main() {
       email: ' AN@Example.com ',
       hoten: ' Nguyễn Văn An ',
       hinhanh: 'anh',
+      matkhau: 'hash-minh-hoa',
     );
     expect(data.keys.toSet(), {'email', 'matkhau', 'hoten', 'hinhanh'});
     expect(data['email'], 'an@example.com');
     expect(data['hoten'], 'Nguyễn Văn An');
-    expect(data['matkhau'], passwordMarker);
+    expect(data['matkhau'], 'hash-minh-hoa');
   });
 
   test('Chỉ nhận ảnh JPEG/PNG không vượt quá 200 KiB', () {

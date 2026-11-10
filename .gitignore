@@ -58,5 +58,7 @@ AGENTS.md
 service-account*.json
 .env
 .env.*
+!.env.example
+/android/app/google-services.json
 db/co_so_du_lieu_thuc_te.json
 docs/
