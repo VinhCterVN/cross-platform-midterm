@@ -1,5 +1,5 @@
 name: midterm
-description: "A new Flutter project."
+description: "Cross Platform Mid Term Project"
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -13,6 +13,8 @@ dependencies:
   firebase_core: ^5.1.0
   flutter:
     sdk: flutter
+  flutter_riverpod: ^3.5.0
+  go_router: ^18.1.4
   image_picker: ^1.2.4
 
 dev_dependencies:

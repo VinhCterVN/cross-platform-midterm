@@ -1,20 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../academic_theme.dart';
+import '../app_state.dart';
 import '../user_repo.dart';
-import 'admin_page.dart';
-import 'profile_page.dart';
-import 'user_form_page.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _form = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _pass = TextEditingController();
@@ -28,42 +28,36 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<void> _open(String id) async {
-    if (kIsWeb && !await isAdmin()) {
-      await logout();
-      if (mounted) _toast('Web chỉ dành cho quản trị viên');
-      return;
-    }
-    if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => kIsWeb ? AdminPage(currentId: id) : ProfilePage(id: id),
-      ),
-    );
-  }
-
   void _toast(String msg) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 
   Future<void> _login() async {
     if (_loading || !_form.currentState!.validate()) return;
     setState(() => _loading = true);
+    final action = ref.read(authActionProvider.notifier);
+    action.setBusy(true);
     try {
       final id = await login(_email.text, _pass.text);
-      if (!mounted) return;
-      if (id != null) await _open(id);
+      if (id != null && kIsWeb && !await isAdmin()) {
+        await logout();
+        if (mounted) _toast('Web chỉ dành cho quản trị viên');
+        return;
+      }
     } catch (e) {
+      // Không tự chuyển trang nếu Auth thành công nhưng lưu hash thất bại.
+      try {
+        await logout();
+      } catch (error) {
+        if (mounted) _toast(errorMessage(error));
+      }
       if (mounted) _toast(errorMessage(e));
     } finally {
+      action.setBusy(false);
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<void> _register() async {
-    final id = await Navigator.of(context)
-        .push<String>(MaterialPageRoute(builder: (_) => const UserFormPage()));
-    if (id != null && mounted) _open(id);
-  }
+  void _register() => context.push('/register');
 
   Widget _formPanel() => ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: 440),

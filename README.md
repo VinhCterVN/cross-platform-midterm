@@ -31,6 +31,24 @@ Firebase client API key là mã định danh công khai, không phải khóa ser
 
 Không thay các SDK Android đã cấu hình. Spark có hạn mức miễn phí: hết hạn mức thì thao tác có thể bị từ chối; không tự nâng gói hay liên kết thanh toán.
 
+## Điều hướng và trạng thái ứng dụng
+
+Ứng dụng dùng **GoRouter** cho điều hướng và **Riverpod** cho phiên Firebase Auth, trạng thái thao tác đăng nhập/đăng ký, quyền admin và dữ liệu tải cho form sửa. `ProviderScope` được khởi tạo sau Firebase; `MainApp` dùng `MaterialApp.router`. Trạng thái tìm kiếm, nhập liệu, chọn ảnh và loading của từng form vẫn giữ cục bộ bằng `StatefulWidget`/`ConsumerStatefulWidget`, không thêm code generation.
+
+| Đường dẫn | Chức năng |
+|---|---|
+| `/login` | Đăng nhập |
+| `/register` | Đăng ký trên Android |
+| `/admin` | Danh sách hồ sơ trên Web |
+| `/admin/users/new` | Admin tạo tài khoản và hồ sơ |
+| `/admin/users/:id/edit` | Admin sửa hồ sơ theo UID |
+| `/profile` | Hồ sơ của người đang đăng nhập trên Android |
+| `/profile/edit` | Sửa hoặc hoàn thiện hồ sơ của mình |
+
+Router theo dõi thay đổi phiên Auth, khôi phục phiên hiện có khi mở app và chuyển về đăng nhập khi đăng xuất. Web kiểm tra quyền admin qua truy vấn Firestore; Android chỉ mở các trang hồ sơ cá nhân. Form sửa tải dữ liệu theo UID nên không phụ thuộc `extra` hoặc dữ liệu truyền qua lịch sử trình duyệt. Lỗi tải hồ sơ/kiểm tra phiên có thông báo và nút thử lại. URL Web dùng chế độ hash mặc định, ví dụ `/#/admin`; không cần cấu hình rewrite cho đường dẫn này.
+
+Guard chỉ phục vụ điều hướng, **không thay thế Firestore Security Rules**. Không đưa mật khẩu, hash hoặc ảnh vào URL. Việc đăng nhập/đăng ký chỉ hoàn tất điều hướng sau khi bước lưu hash/hồ sơ kết thúc; tài khoản Auth đã tạo nhưng ghi hồ sơ lỗi vẫn có thể đăng nhập Android để hoàn thiện. Theo yêu cầu, không thêm/chạy tests và không cập nhật các file trong `docs/` cho lần thay đổi này.
+
 ## Phạm vi quản trị
 
 Web tạo người dùng bằng Auth của Firebase App phụ để **không mất phiên admin**. Sau khi tạo, email chỉ đọc trong form; Web sửa họ tên và ảnh. Đổi email, đặt lại mật khẩu, khóa hoặc xóa tài khoản Authentication của người khác thực hiện tại **Firebase Console**.

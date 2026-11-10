@@ -3,24 +3,27 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../academic_theme.dart';
+import '../app_state.dart';
 import '../user_repo.dart';
 import 'avatar.dart';
 
-/// Form thêm / sửa người dùng. Truyền [id] + [data] để sửa; pop về id đã lưu.
-class UserFormPage extends StatefulWidget {
+/// Form thêm / sửa người dùng. Truyền [id] + [data] để sửa.
+class UserFormPage extends ConsumerStatefulWidget {
   const UserFormPage({super.key, this.id, this.data});
 
   final String? id;
   final Map<String, dynamic>? data;
 
   @override
-  State<UserFormPage> createState() => _UserFormPageState();
+  ConsumerState<UserFormPage> createState() => _UserFormPageState();
 }
 
-class _UserFormPageState extends State<UserFormPage> {
+class _UserFormPageState extends ConsumerState<UserFormPage> {
   final _form = GlobalKey<FormState>();
   late final _email = TextEditingController(text: widget.data?['email']);
   late final _hoten = TextEditingController(text: widget.data?['hoten']);
@@ -79,19 +82,57 @@ class _UserFormPageState extends State<UserFormPage> {
     if (_saving || _picking || !_form.currentState!.validate()) return;
     if (_hinhanh.isEmpty) return _toast('Vui lòng chọn hình ảnh');
     setState(() => _saving = true);
+    final action = ref.read(authActionProvider.notifier);
+    final registering = !_isEdit && !kIsWeb;
+    if (registering) action.setBusy(true);
     try {
-      final id = await saveUser(
+      await saveUser(
         id: widget.id,
         email: _email.text,
         hoten: _hoten.text,
         hinhanh: _hinhanh,
         password: _needsPassword ? _pass.text : null,
       );
-      if (mounted) Navigator.of(context).pop(id);
+      if (!mounted) return;
+      setState(() => _saving = false);
+      // PopScope phải được rebuild trước khi đóng form vừa lưu.
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+      if (registering) {
+        action.setBusy(false);
+        context.go('/profile');
+      } else {
+        if (widget.id case final id?) {
+          ref.invalidate(editableProfileProvider(id));
+        }
+        _close();
+      }
     } catch (e) {
+      if (registering) {
+        try {
+          await logout();
+        } catch (error) {
+          if (mounted) _toast(errorMessage(error));
+        }
+      }
       if (mounted) _toast(errorMessage(e));
     } finally {
+      if (registering) action.setBusy(false);
       if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  void _close() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(
+        kIsWeb
+            ? '/admin'
+            : auth.currentUser == null
+            ? '/login'
+            : '/profile',
+      );
     }
   }
 
@@ -312,9 +353,7 @@ class _UserFormPageState extends State<UserFormPage> {
                       const SizedBox(height: 8),
                       Center(
                         child: TextButton(
-                          onPressed: _busy
-                              ? null
-                              : () => Navigator.of(context).pop(),
+                          onPressed: _busy ? null : _close,
                           child: const Text('Hủy và quay lại'),
                         ),
                       ),

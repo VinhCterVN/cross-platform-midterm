@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../academic_theme.dart';
 import '../user_repo.dart';
 import 'avatar.dart';
-import 'login_page.dart';
-import 'user_form_page.dart';
 
 /// Người dùng xem và cập nhật thông tin, hình ảnh của mình.
 class ProfilePage extends StatelessWidget {
@@ -55,12 +54,15 @@ class ProfilePage extends StatelessWidget {
         IconButton(
           tooltip: 'Đăng xuất',
           onPressed: () async {
-            await logout();
-            if (!context.mounted) return;
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const LoginPage()),
-              (_) => false,
-            );
+            try {
+              await logout();
+              if (context.mounted) context.go('/login');
+            } catch (error) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(errorMessage(error))));
+              }
+            }
           },
           icon: const Icon(Icons.logout),
         ),
@@ -70,15 +72,17 @@ class ProfilePage extends StatelessWidget {
       child: StreamBuilder(
         stream: users.doc(id).snapshots(),
         builder: (context, snap) {
-          if (snap.hasError)
+          if (snap.hasError) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(errorMessage(snap.error!)),
               ),
             );
-          if (!snap.hasData)
+          }
+          if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
           final data = snap.data!.data();
           if (data == null) {
             return Center(
@@ -109,18 +113,7 @@ class ProfilePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         FilledButton(
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => UserFormPage(
-                                id: id,
-                                data: {
-                                  'email': auth.currentUser?.email ?? '',
-                                  'hoten': '',
-                                  'hinhanh': '',
-                                },
-                              ),
-                            ),
-                          ),
+                          onPressed: () => context.push('/profile/edit'),
                           child: const Text('Hoàn thiện hồ sơ'),
                         ),
                       ],
@@ -234,11 +227,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 22),
                   FilledButton.icon(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => UserFormPage(id: id, data: data),
-                      ),
-                    ),
+                    onPressed: () => context.push('/profile/edit'),
                     icon: const Icon(Icons.edit_outlined, size: 19),
                     label: const Text('Cập nhật hồ sơ'),
                   ),

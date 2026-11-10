@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 import '../academic_theme.dart';
 import '../user_repo.dart';
 import 'avatar.dart';
-import 'login_page.dart';
-import 'user_form_page.dart';
 
 /// Nền tảng Web: quản lý hồ sơ từ luồng dữ liệu Firestore.
 class AdminPage extends StatefulWidget {
@@ -24,20 +23,19 @@ class _AdminPageState extends State<AdminPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 
   Future<void> _logout() async {
-    await logout();
-    if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginPage()),
-      (_) => false,
-    );
+    try {
+      await logout();
+      if (mounted) context.go('/login');
+    } catch (error) {
+      if (mounted) _toast(errorMessage(error));
+    }
   }
 
-  void _openForm([String? id, Map<String, dynamic>? data]) =>
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => UserFormPage(id: id, data: data),
-        ),
-      );
+  void _openForm([String? id]) => context.push(
+    id == null
+        ? '/admin/users/new'
+        : '/admin/users/${Uri.encodeComponent(id)}/edit',
+  );
 
   Future<void> _delete(String id, String email) async {
     final ok = await showDialog<bool>(
@@ -74,10 +72,11 @@ class _AdminPageState extends State<AdminPage> {
     try {
       final json = await exportUsersJson();
       await Clipboard.setData(ClipboardData(text: json));
-      if (mounted)
+      if (mounted) {
         _toast(
           'Đã sao chép JSON. Dữ liệu có hash mật khẩu — chỉ lưu và chia sẻ ở nơi an toàn.',
         );
+      }
     } catch (e) {
       if (mounted) _toast(errorMessage(e));
     } finally {
@@ -218,7 +217,7 @@ class _AdminPageState extends State<AdminPage> {
             runSpacing: 8,
             children: [
               OutlinedButton.icon(
-                onPressed: () => _openForm(id, data),
+                onPressed: () => _openForm(id),
                 icon: const Icon(Icons.edit_outlined, size: 17),
                 label: const Text('Chỉnh sửa'),
               ),
@@ -319,17 +318,19 @@ class _AdminPageState extends State<AdminPage> {
                         StreamBuilder(
                           stream: users.snapshots(),
                           builder: (context, snap) {
-                            if (snap.hasError)
+                            if (snap.hasError) {
                               return AcademicPanel(
                                 child: Text(errorMessage(snap.error!)),
                               );
-                            if (!snap.hasData)
+                            }
+                            if (!snap.hasData) {
                               return const Padding(
                                 padding: EdgeInsets.all(48),
                                 child: Center(
                                   child: CircularProgressIndicator(),
                                 ),
                               );
+                            }
                             final docs = snap.data!.docs
                                 .where(
                                   (d) =>

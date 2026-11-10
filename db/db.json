@@ -1,0 +1,16 @@
+{
+	"users": {
+		"DDMPmIHI6SOoOpTLsIFEMLDuan72": {
+			"hoten": "Cuong",
+			"email": "cuongna.dev@gmail.com",
+			"hinhanh": "url",
+			"matkhau": "pbkdf2-sha256$600000$1ClpA7TaTXe8xvWpoxdiOQ=="
+		},
+		"nNcFkEDHWAM4sxyyLuSYaMYH46S2": {
+			"hinhanh": "url",
+			"email": "baobungbu.kiddo@gmail.com",
+			"hoten": "Bào Bụng Bự",
+			"matkhau": "pbkdf2-sha256$600000$9u9+fgjEhTCwQ6X7Dy2XdQ==$"
+		}
+	}
+}
