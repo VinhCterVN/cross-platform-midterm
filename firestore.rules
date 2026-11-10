@@ -11,6 +11,11 @@ service cloud.firestore {
     function owner(uid) {
       return request.auth != null && request.auth.uid == uid;
     }
+    function validHash(value) {
+      // Rules chỉ xác minh định dạng, không thể đối chiếu mật khẩu với Firebase Auth.
+      return value is string && value.size() == 90 &&
+        value.matches('^pbkdf2-sha256[$]600000[$][A-Za-z0-9+/]{22}==[$][A-Za-z0-9+/]{43}=$');
+    }
     function validProfile() {
       let d = request.resource.data;
       return d.keys().hasAll(['email', 'matkhau', 'hoten', 'hinhanh']) &&
@@ -18,7 +23,9 @@ service cloud.firestore {
         d.email is string && d.email.size() <= 254 &&
         d.email == d.email.lower() &&
         d.email.matches('^[^@\\s]+@[^@\\s]+[.][^@\\s]+$') &&
-        d.matkhau == 'Được quản lý bởi Firebase Authentication' &&
+        d.matkhau is string &&
+        (validHash(d.matkhau) ||
+          d.matkhau == 'Được quản lý bởi Firebase Authentication') &&
         d.hoten is string && d.hoten.size() >= 1 && d.hoten.size() <= 100 &&
         d.hoten.matches('.*\\S.*') &&
         d.hinhanh is string && d.hinhanh.size() >= 12 &&
@@ -30,10 +37,14 @@ service cloud.firestore {
     match /users/{uid} {
       allow get: if owner(uid) || isAdmin();
       allow list: if isAdmin();
-      allow create: if validProfile() && (isAdmin() ||
+      allow create: if validProfile() && validHash(request.resource.data.matkhau) && (isAdmin() ||
         (owner(uid) && request.resource.data.email == request.auth.token.email.lower()));
-      allow update: if (owner(uid) || isAdmin()) && validProfile() &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hoten', 'hinhanh']);
+      allow update: if validProfile() && (
+        ((owner(uid) || isAdmin()) && request.resource.data.diff(resource.data)
+          .affectedKeys().hasOnly(['hoten', 'hinhanh'])) ||
+        (owner(uid) && validHash(request.resource.data.matkhau) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['matkhau']))
+      );
       // Xóa hồ sơ không thu hồi Auth. Người dùng vẫn có thể tạo lại hồ sơ của mình.
       allow delete: if isAdmin() && !adminUid(uid);
     }

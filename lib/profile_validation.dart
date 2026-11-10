@@ -40,9 +40,10 @@ Map<String, String> profileData({
   required String email,
   required String hoten,
   required String hinhanh,
+  required String matkhau,
 }) => {
   'email': normalizeEmail(email),
-  'matkhau': passwordMarker,
+  'matkhau': matkhau,
   'hoten': hoten.trim(),
   'hinhanh': hinhanh,
 };

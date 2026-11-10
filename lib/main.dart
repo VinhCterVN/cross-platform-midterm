@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'academic_theme.dart';
 import 'firebase_options.dart';
 import 'pages/login_page.dart';
 
@@ -20,7 +21,8 @@ Future<void> main() async {
               padding: EdgeInsets.all(24),
               child: Text(
                 'Chưa kết nối được Firebase.\n'
-                'Làm theo docs/huong_dan_firebase.md, chạy flutterfire configure rồi khởi động lại.',
+                'Kiểm tra .env theo .env.example và cấu hình Firebase. '
+                'Chạy với --dart-define-from-file=.env rồi khởi động lại.',
                 textAlign: TextAlign.center,
               ),
             ),
@@ -37,9 +39,9 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Quản lý người dùng',
+      title: 'Hồ sơ học đường',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: Colors.indigo),
+      theme: academicTheme(),
       home: const LoginPage(),
     );
   }

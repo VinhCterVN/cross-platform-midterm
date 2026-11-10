@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
+import 'password_hash.dart';
 import 'profile_validation.dart';
 export 'profile_validation.dart';
 
@@ -29,7 +30,24 @@ Future<String?> login(String email, String password) async {
     email: normalizeEmail(email),
     password: password,
   );
-  return credential.user?.uid;
+  final uid = credential.user?.uid;
+  if (uid != null) {
+    // Cập nhật bản băm từ mật khẩu vừa được Auth xác thực, kể cả sau khi reset.
+    final profile = await users
+        .doc(uid)
+        .get(const GetOptions(source: Source.server));
+    if (profile.exists) {
+      final hash = await hashPassword(password);
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final ref = users.doc(uid);
+        final current = await transaction.get(ref);
+        if (current.exists) {
+          transaction.update(ref, {'matkhau': hash});
+        }
+      });
+    }
+  }
+  return uid;
 }
 
 Future<void> logout() => auth.signOut();
@@ -55,7 +73,33 @@ Future<String> saveUser({
   required String hinhanh,
   String? password,
 }) async {
-  final data = profileData(email: email, hoten: hoten, hinhanh: hinhanh);
+  final creating = id == null;
+  // Mật khẩu chỉ dùng để tạo Auth hoặc xác thực lại khi hoàn thiện hồ sơ thiếu.
+  String? hash;
+  if (creating || (password != null && password.isNotEmpty)) {
+    if (validatePassword(password) != null) {
+      throw const FormatException('Mật khẩu không hợp lệ');
+    }
+    if (!creating) {
+      final current = auth.currentUser;
+      if (current == null || current.uid != id) {
+        throw FirebaseAuthException(code: 'requires-recent-login');
+      }
+      await current.reauthenticateWithCredential(
+        EmailAuthProvider.credential(
+          email: current.email!,
+          password: password!,
+        ),
+      );
+    }
+    hash = await hashPassword(password!);
+  }
+  final data = profileData(
+    email: email,
+    hoten: hoten,
+    hinhanh: hinhanh,
+    matkhau: hash ?? '',
+  );
   if (validateEmail(email) != null || validateName(hoten) != null) {
     throw const FormatException('Thông tin không hợp lệ');
   }
@@ -63,11 +107,7 @@ Future<String> saveUser({
   if (validatePhotoBytes(bytes) != null || base64Encode(bytes) != hinhanh) {
     throw const FormatException('Ảnh không hợp lệ');
   }
-  final creating = id == null;
   if (creating) {
-    if (validatePassword(password) != null) {
-      throw const FormatException('Mật khẩu không hợp lệ');
-    }
     if (kIsWeb) {
       if (!await isAdmin()) {
         throw FirebaseException(
@@ -105,6 +145,11 @@ Future<String> saveUser({
         if (before.exists) {
           transaction.update(ref, {'hoten': data['hoten'], 'hinhanh': hinhanh});
         } else {
+          if (hash == null) {
+            throw const FormatException(
+              'Xác nhận mật khẩu để hoàn thiện hồ sơ',
+            );
+          }
           transaction.set(ref, data);
         }
       });
