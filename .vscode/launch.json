@@ -2,13 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Hồ sơ học đường",
+      "name": "Kho hàng",
       "request": "launch",
       "type": "dart",
       "toolArgs": ["--dart-define-from-file=.env"]
     },
     {
-      "name": "Hồ sơ học đường (release)",
+      "name": "Kho hàng (release)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",

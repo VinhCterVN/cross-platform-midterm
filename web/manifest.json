@@ -1,11 +1,11 @@
 {
-  "name": "Quản lý hồ sơ người dùng",
-  "short_name": "Hồ sơ",
+  "name": "Kho hàng — Quản lý sản phẩm",
+  "short_name": "Kho hàng",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#0175C2",
-  "theme_color": "#0175C2",
-  "description": "Ứng dụng quản lý hồ sơ người dùng",
+  "background_color": "#F3F7F7",
+  "theme_color": "#087F75",
+  "description": "Quản lý sản phẩm, hình ảnh, giá và số lượng",
   "orientation": "portrait-primary",
   "prefer_related_applications": false,
   "icons": [

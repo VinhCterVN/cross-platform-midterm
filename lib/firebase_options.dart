@@ -1,74 +1,35 @@
-// Cấu hình FlutterFire; API key được truyền từ .env lúc build.
-// ignore_for_file: type=lint
-import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
-/// Default [FirebaseOptions] for use with your Firebase apps.
-///
-/// Example:
-/// ```dart
-/// import 'firebase_options.dart';
-/// // ...
-/// await Firebase.initializeApp(
-///   options: DefaultFirebaseOptions.currentPlatform,
-/// );
-/// ```
+// Có thể dùng .env hoặc thay file này bằng đầu ra của flutterfire configure.
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    final apiKey = kIsWeb ? web.apiKey : android.apiKey;
-    if (apiKey.isEmpty) {
-      throw StateError(
-        'Thiếu Firebase API key. Chạy Flutter với --dart-define-from-file=.env',
-      );
+    if (!kIsWeb && defaultTargetPlatform != TargetPlatform.android) {
+      throw UnsupportedError('Ứng dụng hỗ trợ Web và Android.');
     }
-    if (kIsWeb) {
-      return web;
+    final options = kIsWeb ? web : android;
+    if ([
+      options.apiKey,
+      options.appId,
+      options.projectId,
+      options.messagingSenderId,
+    ].any((value) => value.isEmpty || value.startsWith('THAY_'))) {
+      throw StateError('Điền cấu hình dự án Firebase mới vào .env.');
     }
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return android;
-      case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
-      case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
-      case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
-      case TargetPlatform.linux:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
-      default:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions are not supported for this platform.',
-        );
-    }
+    return options;
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
+  static const web = FirebaseOptions(
     apiKey: String.fromEnvironment('FIREBASE_WEB_API_KEY'),
-    appId: '1:121441361749:web:6acac64a318fc0b24b19dc',
-    messagingSenderId: '121441361749',
-    projectId: 'profile-management-3a2f7',
-    authDomain: 'profile-management-3a2f7.firebaseapp.com',
-    storageBucket: 'profile-management-3a2f7.firebasestorage.app',
+    appId: String.fromEnvironment('FIREBASE_WEB_APP_ID'),
+    messagingSenderId: String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
+    projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
+    authDomain: String.fromEnvironment('FIREBASE_AUTH_DOMAIN'),
   );
-
-  static const FirebaseOptions android = FirebaseOptions(
+  static const android = FirebaseOptions(
     apiKey: String.fromEnvironment('FIREBASE_ANDROID_API_KEY'),
-    appId: '1:121441361749:android:da2af85d76f54f854b19dc',
-    messagingSenderId: '121441361749',
-    projectId: 'profile-management-3a2f7',
-    storageBucket: 'profile-management-3a2f7.firebasestorage.app',
+    appId: String.fromEnvironment('FIREBASE_ANDROID_APP_ID'),
+    messagingSenderId: String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
+    projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
   );
 }

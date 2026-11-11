@@ -1,4 +1,4 @@
 {
   "indexes": [],
-  "fieldOverrides": [{"collectionGroup": "users", "fieldPath": "hinhanh", "indexes": []}]
+  "fieldOverrides": [{"collectionGroup": "products", "fieldPath": "image", "indexes": []}]
 }

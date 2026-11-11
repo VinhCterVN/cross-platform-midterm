@@ -1,22 +1,30 @@
 {
-  "users": {
-    "mau_quan_tri": {
-      "email": "quantri@example.com",
-      "matkhau": "pbkdf2-sha256$600000$CtHHKUdq+dLF5HYdBphZ7A==$y/jofr8+MItGz9adaTHtZQr+1UAu1fldWXS+PywmlpM=",
-      "hoten": "Quản trị viên mẫu",
-      "hinhanh": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAfklEQVR4nNXOQREAIADDsFK3828AETy4RkHONsokTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuL8HXh1AaCzAbsgOB4EAAAAAElFTkSuQmCC"
+  "owners": {
+    "UID_MINH_HOA_NGUOI_DUNG_A": {
+      "products": {
+        "ban_phim_co": {
+          "name": "Bàn phím cơ",
+          "price": 750000,
+          "soluong": 12,
+          "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+        },
+        "chuot_khong_day": {
+          "name": "Chuột không dây",
+          "price": 290000,
+          "soluong": 3,
+          "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+        }
+      }
     },
-    "mau_nguyen_van_an": {
-      "email": "an@example.com",
-      "matkhau": "pbkdf2-sha256$600000$AT6sBAio5xQXI8lwC5N5xQ==$98UGokxkSjXxFkPWeUo9r4flfTg9CWf0GdGUbAXtKqA=",
-      "hoten": "Nguyễn Văn An",
-      "hinhanh": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAfklEQVR4nNXOQREAIADDsFK3828AETy4RkHONsokTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuL8HXh1AaCzAbsgOB4EAAAAAElFTkSuQmCC"
-    },
-    "mau_tran_thi_binh": {
-      "email": "binh@example.com",
-      "matkhau": "pbkdf2-sha256$600000$nURfU04+lezDHQjZs02Ykg==$xQqiPxW+2G7oU4RcfdbLz75UxRTXajVfKr8dLUb9L8Q=",
-      "hoten": "Trần Thị Bình",
-      "hinhanh": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAfklEQVR4nNXOQREAIADDsFK3828AETy4RkHONsokTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuIkTuL8HXh1AaCzAbsgOB4EAAAAAElFTkSuQmCC"
+    "UID_MINH_HOA_NGUOI_DUNG_B": {
+      "products": {
+        "tai_nghe": {
+          "name": "Tai nghe chụp tai",
+          "price": 450000,
+          "soluong": 0,
+          "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+        }
+      }
     }
   }
 }
