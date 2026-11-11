@@ -14,10 +14,10 @@ class ProductImage extends StatelessWidget {
     final fallback = Container(
       color: canvas,
       alignment: Alignment.center,
-      child: const Icon(Icons.image_outlined, color: muted, size: 32),
+      child: const Icon(Icons.inventory_2_outlined, color: muted, size: 28),
     );
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(8),
       child: SizedBox(
         width: size,
         height: size,

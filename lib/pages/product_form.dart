@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../auth_repo.dart';
@@ -53,7 +54,6 @@ class _ProductFormState extends State<ProductForm> {
       final bytes = await file.readAsBytes();
       final message = validateImage(bytes);
       if (message != null) throw FormatException(message);
-      // Đọc thực tế ảnh, không chỉ kiểm tra đuôi file hoặc MIME do người dùng cung cấp.
       final codec = await ui.instantiateImageCodec(bytes, targetWidth: 64);
       try {
         final frame = await codec.getNextFrame();
@@ -78,7 +78,7 @@ class _ProductFormState extends State<ProductForm> {
   Future<void> _save() async {
     if (_busy || _picking || !_form.currentState!.validate()) return;
     if (_image.isEmpty) {
-      setState(() => _error = 'Chọn ảnh sản phẩm trước khi lưu.');
+      setState(() => _error = 'Vui lòng đính kèm hình ảnh đại diện sản phẩm.');
       return;
     }
     setState(() {
@@ -105,11 +105,16 @@ class _ProductFormState extends State<ProductForm> {
   Widget build(BuildContext context) => PopScope(
     canPop: !_busy && !_picking,
     child: Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: line, width: 1),
+      ),
       insetPadding: const EdgeInsets.all(16),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 620),
+        constraints: const BoxConstraints(maxWidth: 580),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(18),
           child: Form(
             key: _form,
             child: Column(
@@ -118,107 +123,141 @@ class _ProductFormState extends State<ProductForm> {
               children: [
                 Row(
                   children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: sageWash,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: line),
+                      ),
+                      child: Icon(
+                        widget.product == null ? Icons.post_add_outlined : Icons.edit_note_outlined,
+                        size: 20,
+                        color: academicGreen,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        widget.product == null ? 'Thêm sản phẩm' : 'Sửa sản phẩm',
-                        style: Theme.of(context).textTheme.headlineMedium,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.product == null ? 'Ghi Danh Sản Phẩm' : 'Hiệu Đính Dữ Liệu',
+                            style: GoogleFonts.newsreader(fontSize: 18, fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            'TIÊU CHUẨN LƯU TRỮ VẬT TƯ',
+                            style: GoogleFonts.jetBrainsMono(fontSize: 9, letterSpacing: 1, color: muted),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(
                       tooltip: 'Đóng',
                       onPressed: _busy || _picking ? null : () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
+                      icon: const Icon(Icons.close, size: 20),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   widget.product == null
-                      ? 'Sản phẩm mới được lưu vào kho hàng của bạn.'
-                      : 'Cập nhật thông tin và hình ảnh sản phẩm.',
-                  style: const TextStyle(color: muted),
-                ),
-                const SizedBox(height: 24),
-                Center(
-                  child: ProductImage(image: _image, size: 180, fit: BoxFit.contain),
+                      ? 'Lập thẻ danh mục mới để quản lý định mức tồn kho và định giá tài sản.'
+                      : 'Cập nhật lại các thông số lưu kho, định giá và hình ảnh thực tế.',
+                  style: GoogleFonts.inter(color: muted, fontSize: 12.5),
                 ),
                 const SizedBox(height: 16),
                 Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: canvas,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: line),
+                    ),
+                    padding: const EdgeInsets.all(6),
+                    child: ProductImage(image: _image, size: 120, fit: BoxFit.contain),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Center(
                   child: Wrap(
-                    spacing: 12,
+                    spacing: 8,
                     runSpacing: 8,
                     alignment: WrapAlignment.center,
                     children: [
                       OutlinedButton.icon(
                         onPressed: _busy || _picking ? null : () => _pick(ImageSource.gallery),
-                        icon: const Icon(Icons.photo_library_outlined),
-                        label: Text(_picking ? 'Đang đọc ảnh…' : 'Chọn ảnh'),
+                        icon: const Icon(Icons.photo_library_outlined, size: 16),
+                        label: Text(_picking ? 'Đang đọc…' : 'Chọn ảnh tư liệu'),
                       ),
                       if (!kIsWeb)
                         OutlinedButton.icon(
                           onPressed: _busy || _picking ? null : () => _pick(ImageSource.camera),
-                          icon: const Icon(Icons.camera_alt_outlined),
+                          icon: const Icon(Icons.camera_alt_outlined, size: 16),
                           label: const Text('Chụp ảnh'),
                         ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Center(
-                  child: Text('PNG / JPEG, tối đa 200 KiB', style: TextStyle(color: muted, fontSize: 12)),
+                const SizedBox(height: 6),
+                Center(
+                  child: Text(
+                    'Định dạng PNG / JPEG, tối đa 200 KiB',
+                    style: GoogleFonts.jetBrainsMono(color: muted, fontSize: 10.5),
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _name,
                   enabled: !_busy,
                   maxLength: 120,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Tên sản phẩm'),
-                  validator: (v) => v == null || v.trim().isEmpty ? 'Nhập tên sản phẩm' : null,
+                  decoration: const InputDecoration(labelText: 'Tên định danh sản phẩm'),
+                  validator: (v) => v == null || v.trim().isEmpty ? 'Vui lòng nhập tên sản phẩm' : null,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 TextFormField(
                   controller: _price,
                   enabled: !_busy,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
-                    labelText: 'Giá sản phẩm (VNĐ)',
-                    helperText: 'Ví dụ: 125000 hoặc 125000,50; không dùng dấu phân cách hàng nghìn.',
+                    labelText: 'Đơn giá định mức (VNĐ)',
+                    helperText: 'Ví dụ: 150000; không dùng dấu chấm phân tách.',
                   ),
                   validator: (_) =>
                       _parsedPrice == null ||
                           !_parsedPrice!.isFinite ||
                           _parsedPrice! < 0 ||
                           _parsedPrice! > 1000000000000
-                      ? 'Giá từ 0 đến 1.000.000.000.000 VNĐ'
+                      ? 'Giá trị phải trong khoảng 0 đến 1.000.000.000.000 VNĐ'
                       : null,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 TextFormField(
                   controller: _quantity,
                   enabled: !_busy,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Số lượng'),
+                  decoration: const InputDecoration(labelText: 'Số lượng vật tư tồn kho'),
                   validator: (v) {
                     final n = int.tryParse((v ?? '').trim());
-                    return n == null || n < 0 || n > 1000000000 ? 'Nhập số nguyên từ 0 đến 1.000.000.000' : null;
+                    return n == null || n < 0 || n > 1000000000 ? 'Nhập số nguyên hợp lệ (0 đến 1.000.000.000)' : null;
                   },
                 ),
                 if (_error != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 18),
-                    child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(_error!, style: GoogleFonts.inter(color: academicCrimson, fontSize: 12.5)),
                   ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
                     onPressed: _busy || _picking ? null : _save,
                     icon: _busy
-                        ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.check),
-                    label: Text(_busy ? 'Đang lưu…' : 'Lưu sản phẩm'),
+                        ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.check, size: 18),
+                    label: Text(_busy ? 'Đang cập nhật…' : 'Lưu sản phẩm'),
                   ),
                 ),
               ],

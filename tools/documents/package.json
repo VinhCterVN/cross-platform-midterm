@@ -1,6 +1,0 @@
-{
-  "name": "midterm-vietnamese-documents",
-  "private": true,
-  "scripts": { "generate": "node generate.cjs" },
-  "dependencies": { "docx": "^9.5.1" }
-}

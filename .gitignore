@@ -61,9 +61,4 @@ service-account*.json
 !.env.example
 /android/app/google-services.json
 db/co_so_du_lieu_thuc_te.json
-docs/*
-!docs/new-requirements.jpg
-!docs/bao_cao_quan_ly_san_pham.docx
-!docs/huong_dan_chuyen_firebase.docx
-!docs/huong_dan_su_dung.docx
-node_modules/
+docs/*.docx
